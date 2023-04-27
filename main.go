@@ -20,12 +20,14 @@ var schemaPath string
 var targetTable string
 var packageName string
 var structName string
+var outFilePath string
 
 func init() {
-	flag.StringVar(&schemaPath, "schema", "-", "path to schema file")
+	flag.StringVar(&schemaPath, "schema", "-", "path to schema file (default: stdin)")
 	flag.StringVar(&targetTable, "table", "", "table name to generate struct definition")
 	flag.StringVar(&packageName, "package", "", "package name to generate struct definition")
 	flag.StringVar(&structName, "struct", "", "struct name to generate definition")
+	flag.StringVar(&outFilePath, "out", "", "path to generate schema definition (default: stdout)")
 }
 
 func readSchema(path string) (string, error) {
@@ -161,5 +163,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Print(structDef)
+	if outFilePath == "" {
+		fmt.Print(structDef)
+	} else {
+		f, err := os.Create(outFilePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer f.Close()
+
+		if _, err := f.WriteString(structDef); err != nil {
+			log.Fatal(err)
+		}
+	}
 }
