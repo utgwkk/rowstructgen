@@ -12,7 +12,7 @@ import (
 //go:embed testdata/schema.sql
 var schema string
 
-func prepareDDL(t *testing.T) *parser.DDL {
+func prepareDDL(t *testing.T, tableName string) *parser.DDL {
 	mysqlParser := database.NewParser(parser.ParserModeMysql)
 	ddls, err := mysqlParser.Parse(schema)
 	if err != nil {
@@ -30,14 +30,40 @@ func prepareDDL(t *testing.T) *parser.DDL {
 }
 
 func TestConvertDDLToStructDef(t *testing.T) {
-	ddl := prepareDDL(t)
-	opts := ConvertOptions{
-		PackageName: "dbrow",
-		StructName:  "User",
+	testcases := []struct {
+		name string
+		opts ConvertOptions
+	}{
+		{
+			name: "default",
+			opts: ConvertOptions{
+				PackageName:               "dbrow",
+				TableName:                 "users",
+				StructName:                "User",
+				GenerateTableNameConstant: false,
+			},
+		},
+		{
+			name: "with table name constants",
+			opts: ConvertOptions{
+				PackageName:               "dbrow",
+				TableName:                 "users",
+				StructName:                "User",
+				GenerateTableNameConstant: true,
+			},
+		},
 	}
-	code, err := convertDDLToStructDef(ddl, opts)
-	if err != nil {
-		t.Fatal(err)
+	for _, tc := range testcases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			ddl := prepareDDL(t, tc.opts.TableName)
+			code, err := convertDDLToStructDef(ddl, tc.opts)
+			if err != nil {
+				t.Fatal(err)
+			}
+			snaps.MatchSnapshot(t, code)
+		})
 	}
-	snaps.MatchSnapshot(t, code)
 }

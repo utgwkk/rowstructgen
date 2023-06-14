@@ -21,6 +21,7 @@ var targetTable string
 var packageName string
 var structName string
 var outFilePath string
+var tableNameConst bool
 
 func init() {
 	flag.StringVar(&schemaPath, "schema", "-", "path to schema file (default: stdin)")
@@ -28,6 +29,7 @@ func init() {
 	flag.StringVar(&packageName, "package", "", "package name to generate struct definition")
 	flag.StringVar(&structName, "struct", "", "struct name to generate definition")
 	flag.StringVar(&outFilePath, "out", "", "path to generate schema definition (default: stdout)")
+	flag.BoolVar(&tableNameConst, "table-name-const", false, "generate table name constant variable (default: false)")
 }
 
 func readSchema(path string) (string, error) {
@@ -114,6 +116,12 @@ func convertDDLToStructDef(ddl *parser.DDL, opts ConvertOptions) (string, error)
 	var buf bytes.Buffer
 
 	buf.WriteString(fmt.Sprintf("package %s\n\n", opts.PackageName))
+
+	if opts.GenerateTableNameConstant {
+		tableNameUpper := strcase.UpperCamelCase(opts.TableName)
+		buf.WriteString(fmt.Sprintf("const Table%s = \"%s\"\n\n", tableNameUpper, opts.TableName))
+	}
+
 	buf.WriteString(fmt.Sprintf("type %s struct {\n", opts.StructName))
 
 	for _, col := range ddl.TableSpec.Columns {
@@ -141,8 +149,10 @@ func main() {
 		OutFilePath: outFilePath,
 
 		ConvertOptions: ConvertOptions{
-			PackageName: packageName,
-			StructName:  structName,
+			PackageName:               packageName,
+			StructName:                structName,
+			TableName:                 targetTable,
+			GenerateTableNameConstant: tableNameConst,
 		},
 	}
 
