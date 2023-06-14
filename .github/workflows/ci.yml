@@ -20,4 +20,5 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.go-version }}
-      - run: go test -v ./...
+      - run: go install github.com/mfridman/tparse@latest
+      - run: set -o pipefail && go test fmt -json | tparse -all
