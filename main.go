@@ -116,7 +116,14 @@ func convertDDLToStructDef(ddl *parser.DDL, opts ConvertOptions) (string, error)
 	var buf bytes.Buffer
 
 	buf.WriteString(fmt.Sprintf("package %s\n\n", opts.PackageName))
+
+	if opts.GenerateTableNameConstant {
+		tableNameUpper := strcase.UpperCamelCase(opts.TableName)
+		buf.WriteString(fmt.Sprintf("const Table%s = \"%s\"\n\n", tableNameUpper, opts.TableName))
+	}
+
 	buf.WriteString(fmt.Sprintf("type %s struct {\n", opts.StructName))
+
 
 	for _, col := range ddl.TableSpec.Columns {
 		fieldName := strcase.UpperCamelCase(col.Name.String())

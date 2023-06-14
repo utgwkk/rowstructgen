@@ -37,9 +37,19 @@ func TestConvertDDLToStructDef(t *testing.T) {
 		{
 			name: "default",
 			opts: ConvertOptions{
-				PackageName: "dbrow",
-				TableName:   "users",
-				StructName:  "User",
+				PackageName:               "dbrow",
+				TableName:                 "users",
+				StructName:                "User",
+				GenerateTableNameConstant: false,
+			},
+		},
+		{
+			name: "with table name constants",
+			opts: ConvertOptions{
+				PackageName:               "dbrow",
+				TableName:                 "users",
+				StructName:                "User",
+				GenerateTableNameConstant: true,
 			},
 		},
 	}

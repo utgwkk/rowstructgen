@@ -13,3 +13,20 @@ type User struct {
 }
 
 ---
+
+[TestConvertDDLToStructDef/with_table_name_constants - 1]
+package dbrow
+
+import "time"
+
+const TableUsers = "users"
+
+type User struct {
+    Id        uint64     `db:"id"`
+    Name      string     `db:"name"`
+    DeletedAt *time.Time `db:"deleted_at"`
+    CreatedAt time.Time  `db:"created_at"`
+    UpdatedAt time.Time  `db:"updated_at"`
+}
+
+---
