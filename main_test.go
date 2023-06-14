@@ -31,13 +31,28 @@ func prepareDDL(t *testing.T) *parser.DDL {
 
 func TestConvertDDLToStructDef(t *testing.T) {
 	ddl := prepareDDL(t)
-	opts := ConvertOptions{
-		PackageName: "dbrow",
-		StructName:  "User",
+	testcases := []struct {
+		name string
+		opts ConvertOptions
+	}{
+		{
+			name: "default",
+			opts: ConvertOptions{
+				PackageName: "dbrow",
+				StructName:  "User",
+			},
+		},
 	}
-	code, err := convertDDLToStructDef(ddl, opts)
-	if err != nil {
-		t.Fatal(err)
+	for _, tc := range testcases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			code, err := convertDDLToStructDef(ddl, tc.opts)
+			if err != nil {
+				t.Fatal(err)
+			}
+			snaps.MatchSnapshot(t, code)
+		})
 	}
-	snaps.MatchSnapshot(t, code)
 }

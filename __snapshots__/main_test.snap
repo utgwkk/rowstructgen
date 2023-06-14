@@ -1,5 +1,5 @@
 
-[TestConvertDDLToStructDef - 1]
+[TestConvertDDLToStructDef/default - 1]
 package dbrow
 
 import "time"
