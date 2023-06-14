@@ -51,7 +51,8 @@ func readSchema(path string) (string, error) {
 	return string(b), nil
 }
 
-func extractTableDefinition(ddls []database.DDLStatement, tableName string) (*parser.DDL, error) {
+func extractTableDefinition(ddls []database.DDLStatement, opts Options) (*parser.DDL, error) {
+	tableName := opts.Table
 	for _, ddl := range ddls {
 		switch ddl := ddl.Statement.(type) {
 		case *parser.DDL:
@@ -104,16 +105,16 @@ func columnTypeToGoType(col *parser.ColumnDefinition) string {
 
 	goType, acceptNull := mysqlTypeToGoType(col)
 	if nullable && !acceptNull {
-		return "*"+goType
+		return "*" + goType
 	}
 	return goType
 }
 
-func convertDDLToStructDef(ddl *parser.DDL, packageName, structName string) (string, error) {
+func convertDDLToStructDef(ddl *parser.DDL, opts ConvertOptions) (string, error) {
 	var buf bytes.Buffer
 
-	buf.WriteString(fmt.Sprintf("package %s\n\n", packageName))
-	buf.WriteString(fmt.Sprintf("type %s struct {\n", structName))
+	buf.WriteString(fmt.Sprintf("package %s\n\n", opts.PackageName))
+	buf.WriteString(fmt.Sprintf("type %s struct {\n", opts.StructName))
 
 	for _, col := range ddl.TableSpec.Columns {
 		fieldName := strcase.UpperCamelCase(col.Name.String())
@@ -134,15 +135,26 @@ func convertDDLToStructDef(ddl *parser.DDL, packageName, structName string) (str
 func main() {
 	flag.Parse()
 
-	if targetTable == "" {
+	opts := Options{
+		SchemaPath:  schemaPath,
+		Table:       targetTable,
+		OutFilePath: outFilePath,
+
+		ConvertOptions: ConvertOptions{
+			PackageName: packageName,
+			StructName:  structName,
+		},
+	}
+
+	if opts.Table == "" {
 		log.Fatal("table name not set")
 	}
 
-	if structName == "" {
+	if opts.ConvertOptions.StructName == "" {
 		log.Fatal("struct name not set")
 	}
 
-	schema, err := readSchema(schemaPath)
+	schema, err := readSchema(opts.SchemaPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -153,20 +165,20 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ddl, err := extractTableDefinition(ddls, targetTable)
+	ddl, err := extractTableDefinition(ddls, opts)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	structDef, err := convertDDLToStructDef(ddl, packageName, structName)
+	structDef, err := convertDDLToStructDef(ddl, opts.ConvertOptions)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if outFilePath == "" {
+	if opts.OutFilePath == "" {
 		fmt.Print(structDef)
 	} else {
-		f, err := os.Create(outFilePath)
+		f, err := os.Create(opts.OutFilePath)
 		if err != nil {
 			log.Fatal(err)
 		}
