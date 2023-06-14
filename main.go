@@ -51,7 +51,8 @@ func readSchema(path string) (string, error) {
 	return string(b), nil
 }
 
-func extractTableDefinition(ddls []database.DDLStatement, tableName string) (*parser.DDL, error) {
+func extractTableDefinition(ddls []database.DDLStatement, opts Options) (*parser.DDL, error) {
+	tableName := opts.Table
 	for _, ddl := range ddls {
 		switch ddl := ddl.Statement.(type) {
 		case *parser.DDL:
@@ -109,11 +110,11 @@ func columnTypeToGoType(col *parser.ColumnDefinition) string {
 	return goType
 }
 
-func convertDDLToStructDef(ddl *parser.DDL, packageName, structName string) (string, error) {
+func convertDDLToStructDef(ddl *parser.DDL, opts ConvertOptions) (string, error) {
 	var buf bytes.Buffer
 
-	buf.WriteString(fmt.Sprintf("package %s\n\n", packageName))
-	buf.WriteString(fmt.Sprintf("type %s struct {\n", structName))
+	buf.WriteString(fmt.Sprintf("package %s\n\n", opts.PackageName))
+	buf.WriteString(fmt.Sprintf("type %s struct {\n", opts.StructName))
 
 	for _, col := range ddl.TableSpec.Columns {
 		fieldName := strcase.UpperCamelCase(col.Name.String())
@@ -164,12 +165,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ddl, err := extractTableDefinition(ddls, opts.Table)
+	ddl, err := extractTableDefinition(ddls, opts)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	structDef, err := convertDDLToStructDef(ddl, opts.ConvertOptions.PackageName, opts.ConvertOptions.StructName)
+	structDef, err := convertDDLToStructDef(ddl, opts.ConvertOptions)
 	if err != nil {
 		log.Fatal(err)
 	}

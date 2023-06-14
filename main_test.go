@@ -19,7 +19,9 @@ func prepareDDL(t *testing.T) *parser.DDL {
 		t.Fatal(err)
 	}
 
-	ddl, err := extractTableDefinition(ddls, "users")
+	ddl, err := extractTableDefinition(ddls, Options{
+		Table: "users",
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -29,7 +31,11 @@ func prepareDDL(t *testing.T) *parser.DDL {
 
 func TestConvertDDLToStructDef(t *testing.T) {
 	ddl := prepareDDL(t)
-	code, err := convertDDLToStructDef(ddl, "dbrow", "User")
+	opts := ConvertOptions{
+		PackageName: "dbrow",
+		StructName: "User",
+	}
+	code, err := convertDDLToStructDef(ddl, opts)
 	if err != nil {
 		t.Fatal(err)
 	}
