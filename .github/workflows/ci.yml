@@ -21,4 +21,5 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
       - run: go install github.com/mfridman/tparse@latest
-      - run: set -o pipefail && go test ./... -json | tparse -all
+      - name: Test
+        run: set -o pipefail && go test ./... -json | tparse -all
