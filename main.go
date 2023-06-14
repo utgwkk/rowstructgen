@@ -21,6 +21,7 @@ var targetTable string
 var packageName string
 var structName string
 var outFilePath string
+var tableNameConst bool
 
 func init() {
 	flag.StringVar(&schemaPath, "schema", "-", "path to schema file (default: stdin)")
@@ -28,6 +29,7 @@ func init() {
 	flag.StringVar(&packageName, "package", "", "package name to generate struct definition")
 	flag.StringVar(&structName, "struct", "", "struct name to generate definition")
 	flag.StringVar(&outFilePath, "out", "", "path to generate schema definition (default: stdout)")
+	flag.BoolVar(&tableNameConst, "table-name-const", false, "generate table name constant variable (default: false)")
 }
 
 func readSchema(path string) (string, error) {
@@ -141,8 +143,9 @@ func main() {
 		OutFilePath: outFilePath,
 
 		ConvertOptions: ConvertOptions{
-			PackageName: packageName,
-			StructName:  structName,
+			PackageName:               packageName,
+			StructName:                structName,
+			GenerateTableNameConstant: tableNameConst,
 		},
 	}
 

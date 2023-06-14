@@ -9,6 +9,7 @@ type Options struct {
 }
 
 type ConvertOptions struct {
-	PackageName string
-	StructName  string
+	PackageName               string
+	StructName                string
+	GenerateTableNameConstant bool
 }
