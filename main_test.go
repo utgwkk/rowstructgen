@@ -33,7 +33,7 @@ func TestConvertDDLToStructDef(t *testing.T) {
 	ddl := prepareDDL(t)
 	opts := ConvertOptions{
 		PackageName: "dbrow",
-		StructName: "User",
+		StructName:  "User",
 	}
 	code, err := convertDDLToStructDef(ddl, opts)
 	if err != nil {
