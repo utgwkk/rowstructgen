@@ -145,6 +145,7 @@ func main() {
 		ConvertOptions: ConvertOptions{
 			PackageName:               packageName,
 			StructName:                structName,
+			TableName:                 targetTable,
 			GenerateTableNameConstant: tableNameConst,
 		},
 	}

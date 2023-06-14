@@ -12,7 +12,7 @@ import (
 //go:embed testdata/schema.sql
 var schema string
 
-func prepareDDL(t *testing.T) *parser.DDL {
+func prepareDDL(t *testing.T, tableName string) *parser.DDL {
 	mysqlParser := database.NewParser(parser.ParserModeMysql)
 	ddls, err := mysqlParser.Parse(schema)
 	if err != nil {
@@ -30,7 +30,6 @@ func prepareDDL(t *testing.T) *parser.DDL {
 }
 
 func TestConvertDDLToStructDef(t *testing.T) {
-	ddl := prepareDDL(t)
 	testcases := []struct {
 		name string
 		opts ConvertOptions
@@ -39,6 +38,7 @@ func TestConvertDDLToStructDef(t *testing.T) {
 			name: "default",
 			opts: ConvertOptions{
 				PackageName: "dbrow",
+				TableName:   "users",
 				StructName:  "User",
 			},
 		},
@@ -48,6 +48,7 @@ func TestConvertDDLToStructDef(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
+			ddl := prepareDDL(t, tc.opts.TableName)
 			code, err := convertDDLToStructDef(ddl, tc.opts)
 			if err != nil {
 				t.Fatal(err)

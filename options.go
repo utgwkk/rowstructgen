@@ -11,5 +11,6 @@ type Options struct {
 type ConvertOptions struct {
 	PackageName               string
 	StructName                string
+	TableName                 string
 	GenerateTableNameConstant bool
 }
