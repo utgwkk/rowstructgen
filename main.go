@@ -124,7 +124,6 @@ func convertDDLToStructDef(ddl *parser.DDL, opts ConvertOptions) (string, error)
 
 	buf.WriteString(fmt.Sprintf("type %s struct {\n", opts.StructName))
 
-
 	for _, col := range ddl.TableSpec.Columns {
 		fieldName := strcase.UpperCamelCase(col.Name.String())
 		goType := columnTypeToGoType(col)
