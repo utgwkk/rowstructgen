@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/gertd/go-pluralize"
 	_ "github.com/k0kubun/sqldef"
 	"github.com/k0kubun/sqldef/database"
 	"github.com/k0kubun/sqldef/parser"
@@ -53,7 +54,7 @@ func readSchema(path string) (string, error) {
 	return string(b), nil
 }
 
-func extractTableDefinition(ddls []database.DDLStatement, opts Options) (*parser.DDL, error) {
+func extractTableDefinition(ddls []database.DDLStatement, opts *Options) (*parser.DDL, error) {
 	tableName := opts.Table
 	for _, ddl := range ddls {
 		switch ddl := ddl.Statement.(type) {
@@ -140,10 +141,15 @@ func convertDDLToStructDef(ddl *parser.DDL, opts ConvertOptions) (string, error)
 	return string(formatted), nil
 }
 
+func guessStructNameFromTable(tableName string) string {
+	pluralized := pluralize.NewClient().Singular(tableName)
+	return strcase.UpperCamelCase(pluralized)
+}
+
 func main() {
 	flag.Parse()
 
-	opts := Options{
+	opts := &Options{
 		SchemaPath:  schemaPath,
 		Table:       targetTable,
 		OutFilePath: outFilePath,
@@ -161,7 +167,7 @@ func main() {
 	}
 
 	if opts.ConvertOptions.StructName == "" {
-		log.Fatal("struct name not set")
+		opts.ConvertOptions.StructName = guessStructNameFromTable(opts.Table)
 	}
 
 	schema, err := readSchema(opts.SchemaPath)

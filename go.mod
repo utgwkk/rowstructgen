@@ -3,6 +3,7 @@ module github.com/utgwkk/rowstructgen
 go 1.18
 
 require (
+	github.com/gertd/go-pluralize v0.2.1
 	github.com/gkampitakis/go-snaps v0.4.6
 	github.com/k0kubun/sqldef v0.15.22
 	github.com/stoewer/go-strcase v1.3.0
@@ -10,7 +11,6 @@ require (
 )
 
 require (
-	github.com/gertd/go-pluralize v0.2.1 // indirect
 	github.com/gkampitakis/ciinfo v0.2.4 // indirect
 	github.com/gkampitakis/go-diff v1.3.2 // indirect
 	github.com/k0kubun/pp/v3 v3.2.0 // indirect
