@@ -10,6 +10,7 @@ require (
 )
 
 require (
+	github.com/gertd/go-pluralize v0.2.1 // indirect
 	github.com/gkampitakis/ciinfo v0.2.4 // indirect
 	github.com/gkampitakis/go-diff v1.3.2 // indirect
 	github.com/k0kubun/pp/v3 v3.2.0 // indirect
