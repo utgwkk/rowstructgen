@@ -16,7 +16,7 @@ CREATE TABLE `users` (
 ```
 
 ```sh
-$ rowstructgen -schema schema.sql -table users -struct User -package row -out row/user.go
+$ rowstructgen -schema schema.sql -table users -package row -out row/user.go
 ```
 
 ```go
