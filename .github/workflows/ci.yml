@@ -20,6 +20,7 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.go-version }}
-      - run: go install github.com/mfridman/tparse@latest
       - name: Test
-        run: set -o pipefail && go test ./... -json | tparse -all
+        run: |
+          set -o pipefail
+          go test ./... -json | go run github.com/mfridman/tparse -all
