@@ -29,7 +29,7 @@ func New(
 	packageName string,
 	structName string,
 	tableNameConst bool,
-) *Options {
+) (*Options, error) {
 	opts := &Options{
 		SchemaPath:  schemaPath,
 		Table:       targetTable,
@@ -47,15 +47,11 @@ func New(
 		opts.ConvertOptions.StructName = guessStructNameFromTable(opts.Table)
 	}
 
-	return opts
-}
-
-func (o *Options) Validate() error {
-	if o.Table == "" {
-		return errors.New("table name not set")
+	if opts.Table == "" {
+		return nil, errors.New("table name not set")
 	}
 
-	return nil
+	return opts, nil
 }
 
 func guessStructNameFromTable(tableName string) string {

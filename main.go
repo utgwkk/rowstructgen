@@ -144,7 +144,7 @@ func convertDDLToStructDef(ddl *parser.DDL, opts options.ConvertOptions) (string
 func main() {
 	flag.Parse()
 
-	opts := options.New(
+	opts, err := options.New(
 		schemaPath,
 		targetTable,
 		outFilePath,
@@ -152,8 +152,7 @@ func main() {
 		structName,
 		tableNameConst,
 	)
-
-	if err := opts.Validate(); err != nil {
+	if err != nil {
 		log.Fatal(err)
 	}
 
