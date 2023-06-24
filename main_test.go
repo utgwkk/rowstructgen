@@ -7,6 +7,7 @@ import (
 	"github.com/gkampitakis/go-snaps/snaps"
 	"github.com/k0kubun/sqldef/database"
 	"github.com/k0kubun/sqldef/parser"
+	"github.com/utgwkk/rowstructgen/options"
 )
 
 //go:embed testdata/schema.sql
@@ -19,7 +20,7 @@ func prepareDDL(t *testing.T, tableName string) *parser.DDL {
 		t.Fatal(err)
 	}
 
-	ddl, err := extractTableDefinition(ddls, &Options{
+	ddl, err := extractTableDefinition(ddls, &options.Options{
 		Table: "users",
 	})
 	if err != nil {
@@ -51,11 +52,11 @@ func TestGuessStructNameFromTableName(t *testing.T) {
 func TestConvertDDLToStructDef(t *testing.T) {
 	testcases := []struct {
 		name string
-		opts ConvertOptions
+		opts options.ConvertOptions
 	}{
 		{
 			name: "default",
-			opts: ConvertOptions{
+			opts: options.ConvertOptions{
 				PackageName:               "dbrow",
 				TableName:                 "users",
 				StructName:                "User",
@@ -64,7 +65,7 @@ func TestConvertDDLToStructDef(t *testing.T) {
 		},
 		{
 			name: "with table name constants",
-			opts: ConvertOptions{
+			opts: options.ConvertOptions{
 				PackageName:               "dbrow",
 				TableName:                 "users",
 				StructName:                "User",

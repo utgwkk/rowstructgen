@@ -1,4 +1,4 @@
-package main
+package options
 
 type Options struct {
 	SchemaPath  string

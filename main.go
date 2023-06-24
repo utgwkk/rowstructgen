@@ -14,6 +14,7 @@ import (
 	"github.com/k0kubun/sqldef/database"
 	"github.com/k0kubun/sqldef/parser"
 	"github.com/stoewer/go-strcase"
+	"github.com/utgwkk/rowstructgen/options"
 	"golang.org/x/tools/imports"
 )
 
@@ -54,7 +55,7 @@ func readSchema(path string) (string, error) {
 	return string(b), nil
 }
 
-func extractTableDefinition(ddls []database.DDLStatement, opts *Options) (*parser.DDL, error) {
+func extractTableDefinition(ddls []database.DDLStatement, opts *options.Options) (*parser.DDL, error) {
 	tableName := opts.Table
 	for _, ddl := range ddls {
 		switch ddl := ddl.Statement.(type) {
@@ -113,7 +114,7 @@ func columnTypeToGoType(col *parser.ColumnDefinition) string {
 	return goType
 }
 
-func convertDDLToStructDef(ddl *parser.DDL, opts ConvertOptions) (string, error) {
+func convertDDLToStructDef(ddl *parser.DDL, opts options.ConvertOptions) (string, error) {
 	var buf bytes.Buffer
 
 	buf.WriteString(fmt.Sprintf("package %s\n\n", opts.PackageName))
@@ -149,12 +150,12 @@ func guessStructNameFromTable(tableName string) string {
 func main() {
 	flag.Parse()
 
-	opts := &Options{
+	opts := &options.Options{
 		SchemaPath:  schemaPath,
 		Table:       targetTable,
 		OutFilePath: outFilePath,
 
-		ConvertOptions: ConvertOptions{
+		ConvertOptions: options.ConvertOptions{
 			PackageName:               packageName,
 			StructName:                structName,
 			TableName:                 targetTable,
