@@ -9,11 +9,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gertd/go-pluralize"
 	_ "github.com/k0kubun/sqldef"
 	"github.com/k0kubun/sqldef/database"
 	"github.com/k0kubun/sqldef/parser"
 	"github.com/stoewer/go-strcase"
+	"github.com/utgwkk/rowstructgen/options"
 	"golang.org/x/tools/imports"
 )
 
@@ -54,7 +54,7 @@ func readSchema(path string) (string, error) {
 	return string(b), nil
 }
 
-func extractTableDefinition(ddls []database.DDLStatement, opts *Options) (*parser.DDL, error) {
+func extractTableDefinition(ddls []database.DDLStatement, opts *options.Options) (*parser.DDL, error) {
 	tableName := opts.Table
 	for _, ddl := range ddls {
 		switch ddl := ddl.Statement.(type) {
@@ -113,7 +113,7 @@ func columnTypeToGoType(col *parser.ColumnDefinition) string {
 	return goType
 }
 
-func convertDDLToStructDef(ddl *parser.DDL, opts ConvertOptions) (string, error) {
+func convertDDLToStructDef(ddl *parser.DDL, opts options.ConvertOptions) (string, error) {
 	var buf bytes.Buffer
 
 	buf.WriteString(fmt.Sprintf("package %s\n\n", opts.PackageName))
@@ -141,33 +141,19 @@ func convertDDLToStructDef(ddl *parser.DDL, opts ConvertOptions) (string, error)
 	return string(formatted), nil
 }
 
-func guessStructNameFromTable(tableName string) string {
-	pluralized := pluralize.NewClient().Singular(tableName)
-	return strcase.UpperCamelCase(pluralized)
-}
-
 func main() {
 	flag.Parse()
 
-	opts := &Options{
-		SchemaPath:  schemaPath,
-		Table:       targetTable,
-		OutFilePath: outFilePath,
-
-		ConvertOptions: ConvertOptions{
-			PackageName:               packageName,
-			StructName:                structName,
-			TableName:                 targetTable,
-			GenerateTableNameConstant: tableNameConst,
-		},
-	}
-
-	if opts.Table == "" {
-		log.Fatal("table name not set")
-	}
-
-	if opts.ConvertOptions.StructName == "" {
-		opts.ConvertOptions.StructName = guessStructNameFromTable(opts.Table)
+	opts, err := options.New(
+		schemaPath,
+		targetTable,
+		outFilePath,
+		packageName,
+		structName,
+		tableNameConst,
+	)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	schema, err := readSchema(opts.SchemaPath)
