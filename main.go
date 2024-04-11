@@ -189,5 +189,6 @@ func main() {
 		if _, err := f.WriteString(structDef); err != nil {
 			log.Fatal(err)
 		}
+		fmt.Println(opts.OutFilePath)
 	}
 }
